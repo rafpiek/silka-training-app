@@ -10,57 +10,108 @@ import SwiftData
 
 struct ContentView: View {
     @Environment(\.modelContext) private var modelContext
-    @Query private var items: [Item]
-
+    @Query private var trainingPlans: [TrainingPlan]
+    @State private var selectedSession: TrainingSession?
+    
+    private var currentTrainingPlan: TrainingPlan? {
+        trainingPlans.first
+    }
+    
+    private let weekDays = ["Poniedziałek", "Wtorek", "Środa", "Czwartek", "Piątek", "Sobota", "Niedziela"]
+    
     var body: some View {
-        NavigationSplitView {
-            List {
-                ForEach(items) { item in
-                    NavigationLink {
-                        Text("Item at \(item.timestamp, format: Date.FormatStyle(date: .numeric, time: .standard))")
-                    } label: {
-                        Text(item.timestamp, format: Date.FormatStyle(date: .numeric, time: .standard))
+        NavigationStack {
+            ScrollView {
+                VStack(spacing: 16) {
+                    if let plan = currentTrainingPlan {
+                        ForEach(weekDays, id: \.self) { day in
+                            if let session = plan.trainingSessions.first(where: { $0.day == day }) {
+                                TrainingDayCard(session: session)
+                                    .onTapGesture {
+                                        selectedSession = session
+                                    }
+                            } else {
+                                RestDayCard(day: day)
+                            }
+                        }
+                    } else {
+                        ContentUnavailableView(
+                            "No Training Plan",
+                            systemImage: "dumbbell",
+                            description: Text("Training plan data not loaded")
+                        )
                     }
                 }
-                .onDelete(perform: deleteItems)
+                .padding()
             }
-#if os(macOS)
-            .navigationSplitViewColumnWidth(min: 180, ideal: 200)
-#endif
-            .toolbar {
-#if os(iOS)
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    EditButton()
-                }
-#endif
-                ToolbarItem {
-                    Button(action: addItem) {
-                        Label("Add Item", systemImage: "plus")
-                    }
-                }
-            }
-        } detail: {
-            Text("Select an item")
-        }
-    }
-
-    private func addItem() {
-        withAnimation {
-            let newItem = Item(timestamp: Date())
-            modelContext.insert(newItem)
-        }
-    }
-
-    private func deleteItems(offsets: IndexSet) {
-        withAnimation {
-            for index in offsets {
-                modelContext.delete(items[index])
+            .navigationTitle("Training Week")
+            .navigationDestination(item: $selectedSession) { session in
+                TrainingSessionView(session: session)
             }
         }
     }
 }
 
+struct TrainingDayCard: View {
+    let session: TrainingSession
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack {
+                VStack(alignment: .leading) {
+                    Text(session.day)
+                        .font(.headline)
+                    Text(session.focus)
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                }
+                Spacer()
+                if session.isCompleted {
+                    Image(systemName: "checkmark.circle.fill")
+                        .foregroundColor(.green)
+                }
+                Image(systemName: "chevron.right")
+                    .foregroundColor(.secondary)
+            }
+            
+            HStack {
+                Label(session.location, systemImage: session.location == "siłownia" ? "dumbbell" : "house")
+                    .font(.caption)
+                Spacer()
+                Text("\(session.exercises.count) exercises")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+            }
+        }
+        .padding()
+        .background(Color(.systemGray6))
+        .cornerRadius(12)
+    }
+}
+
+struct RestDayCard: View {
+    let day: String
+    
+    var body: some View {
+        HStack {
+            VStack(alignment: .leading) {
+                Text(day)
+                    .font(.headline)
+                Text("Rest Day")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+            }
+            Spacer()
+            Image(systemName: "bed.double")
+                .foregroundColor(.secondary)
+        }
+        .padding()
+        .background(Color(.systemGray6).opacity(0.5))
+        .cornerRadius(12)
+    }
+}
+
 #Preview {
     ContentView()
-        .modelContainer(for: Item.self, inMemory: true)
+        .modelContainer(for: TrainingPlan.self, inMemory: true)
 }

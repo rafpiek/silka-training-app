@@ -6,6 +6,10 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		B5D88CCD2E6EF7040026435F /* Training Plan for Muscle Gain.json in Resources */ = {isa = PBXBuildFile; fileRef = B5D88CCC2E6EF7040026435F /* Training Plan for Muscle Gain.json */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		B5D88CAA2E6EF3400026435F /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -27,6 +31,8 @@
 		B5D88C982E6EF3400026435F /* silka.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = silka.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		B5D88CA92E6EF3400026435F /* silkaTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = silkaTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		B5D88CB32E6EF3400026435F /* silkaUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = silkaUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		B5D88CCA2E6EF7030026435F /* silka.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = silka.xcodeproj; sourceTree = "<group>"; };
+		B5D88CCC2E6EF7040026435F /* Training Plan for Muscle Gain.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = "silka/data/Training Plan for Muscle Gain.json"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -95,6 +101,14 @@
 			);
 			sourceTree = "<group>";
 		};
+		B5D88CCE2E6EF7050026435F /* data */ = {
+			isa = PBXGroup;
+			children = (
+				B5D88CCC2E6EF7040026435F /* Training Plan for Muscle Gain.json */,
+			);
+			path = data;
+			sourceTree = "<group>";
+		};
 		B5D88C992E6EF3400026435F /* Products */ = {
 			isa = PBXGroup;
 			children = (
@@ -102,6 +116,11 @@
 				B5D88CA92E6EF3400026435F /* silkaTests.xctest */,
 				B5D88CB32E6EF3400026435F /* silkaUITests.xctest */,
 			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		B5D88CCB2E6EF7030026435F /* Products */ = {
+			isa = PBXGroup;
 			name = Products;
 			sourceTree = "<group>";
 		};
@@ -211,6 +230,12 @@
 			preferredProjectObjectVersion = 77;
 			productRefGroup = B5D88C992E6EF3400026435F /* Products */;
 			projectDirPath = "";
+			projectReferences = (
+				{
+					ProductGroup = B5D88CCB2E6EF7030026435F /* Products */;
+					ProjectRef = B5D88CCA2E6EF7030026435F /* silka.xcodeproj */;
+				},
+			);
 			projectRoot = "";
 			targets = (
 				B5D88C972E6EF3400026435F /* silka */,
@@ -225,6 +250,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B5D88CCD2E6EF7040026435F /* Training Plan for Muscle Gain.json in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

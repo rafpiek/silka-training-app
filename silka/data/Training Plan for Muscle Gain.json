@@ -1,0 +1,300 @@
+{
+  "version": "1.0",
+  "profile": {
+    "age": 35,
+    "sex": "M",
+    "height_cm": 178,
+    "weight_kg": 120,
+    "conditions": [
+      "insulinooporność",
+      "niedoczynność tarczycy",
+      "ból lewego kolana przy schodzeniu (6/10)"
+    ],
+    "meds": [
+      "metformina",
+      "Letrox (5×75 mcg + 2×50 mcg tygodniowo)"
+    ],
+    "goal": "rekompozycja (budowa mięśni + redukcja tłuszczu)",
+    "split": "Full Body 3×/tydz.",
+    "intensity": "większość serii RIR 2–3, ostatnia 1–2",
+    "cardio": "LISS 8–12 min po siłowym",
+    "home_equipment": [
+      "ławka regulowana",
+      "hantle do 2×15 kg",
+      "gumy",
+      "mata"
+    ],
+    "gym_equipment": "pełne",
+    "session_time_min": 60
+  },
+  "warmup_and_knee_rehab": [
+    {
+      "name_pl": "World’s Greatest Stretch",
+      "name_en": "World's Greatest Stretch",
+      "sets": "2–3 obie strony",
+      "tempo": "płynnie",
+      "video_url": "https://www.youtube.com/watch?v=aiN-2yAIkec"
+    },
+    {
+      "name_pl": "TKE – wyprost kolana z gumą",
+      "name_en": "Banded Terminal Knee Extension",
+      "sets": "2×15/str.",
+      "tempo": "1–0–2 + pauza w wyproście",
+      "video_url": "https://www.youtube.com/watch?v=xdKm8PSX438"
+    },
+    {
+      "name_pl": "Spanish Squat (izometryka)",
+      "name_en": "Spanish Squat Isometric",
+      "sets": "2×8–10 płytko",
+      "tempo": "kontrola",
+      "video_url": "https://www.youtube.com/watch?v=Aq-QrVYZ-Vc"
+    },
+    {
+      "name_pl": "Step-down z niskiego podestu",
+      "name_en": "Step Down Progression",
+      "sets": "1×6–8/str.",
+      "tempo": "3–0–1 (wolne zejście)",
+      "video_url": "https://www.youtube.com/watch?v=rvI7OxBQqS4"
+    }
+  ],
+  "variants": {
+    "A_2x_gym_1x_home": {
+      "schedule": [
+        {
+          "day": "Poniedziałek",
+          "location": "siłownia",
+          "focus": "klatka + wiosło",
+          "exercises": [
+            {
+              "name_pl": "Wyciskanie sztangi leżąc",
+              "name_en": "Barbell Bench Press",
+              "sets_reps": "4×6–8",
+              "start_weight_kg": 55,
+              "rir": "2–3 (ostatnia 1–2)",
+              "video_url": "https://www.youtube.com/watch?v=4Y2ZdHCOXok"
+            },
+            {
+              "name_pl": "Wiosłowanie sztangą",
+              "name_en": "Barbell Row",
+              "sets_reps": "4×8–10",
+              "start_weight_kg": 45,
+              "rir": "2–3",
+              "video_url": "https://www.youtube.com/watch?v=RQU8wZPbioA"
+            },
+            {
+              "name_pl": "Martwy ciąg na trap bar (wysokie uchwyty)",
+              "name_en": "Trap Bar Deadlift (high handles)",
+              "sets_reps": "3×5–6",
+              "start_weight_kg": 80,
+              "rir": "2–3",
+              "video_url": "https://www.youtube.com/watch?v=eIFW8zspJzQ"
+            },
+            {
+              "name_pl": "Wyciskanie hantli skos +",
+              "name_en": "Incline Dumbbell Press",
+              "sets_reps": "3×8–10",
+              "start_weight_kg_per_hand": 24,
+              "rir": "2–3",
+              "video_url": "https://www.youtube.com/watch?v=kxowbMbeobA"
+            },
+            {
+              "name_pl": "Face Pull",
+              "name_en": "Face Pull",
+              "sets_reps": "2–3×12–15",
+              "video_url": "https://www.youtube.com/watch?v=ljgqer1ZpXg"
+            },
+            {
+              "name_pl": "Pallof Press",
+              "name_en": "Pallof Press",
+              "sets_reps": "2×10–12/str.",
+              "video_url": "https://www.youtube.com/watch?v=gHGLwQGvtxg"
+            }
+          ],
+          "cardio": "LISS 8–12 min"
+        },
+        {
+          "day": "Wtorek",
+          "location": "siłownia",
+          "focus": "plecy (szerokość) + górna klatka",
+          "exercises": [
+            {
+              "name_pl": "Ściąganie drążka do klatki",
+              "name_en": "Lat Pulldown",
+              "sets_reps": "4×8–10",
+              "start_weight_kg": "50–55",
+              "rir": "2–3",
+              "video_url": "https://www.youtube.com/watch?v=CAwf7n6Luuc"
+            },
+            {
+              "name_pl": "Wyciskanie hantli skos +",
+              "name_en": "Incline Dumbbell Press",
+              "sets_reps": "4×8–10",
+              "start_weight_kg_per_hand": 26,
+              "rir": "2–3",
+              "video_url": "https://www.youtube.com/watch?v=kxowbMbeobA"
+            },
+            {
+              "name_pl": "Przysiad do ławki (płytko)",
+              "name_en": "Box Squat (to bench)",
+              "sets_reps": "3×6–8",
+              "start_weight_kg": "40–50",
+              "rir": "2–3",
+              "video_url": "https://www.youtube.com/watch?v=mIzIMLuwlEM"
+            },
+            {
+              "name_pl": "Rumuński martwy ciąg",
+              "name_en": "Romanian Deadlift (RDL)",
+              "sets_reps": "3×8–10",
+              "start_weight_kg": 60,
+              "rir": "2–3",
+              "video_url": "https://www.youtube.com/watch?v=jEy_czb3RKA"
+            },
+            {
+              "name_pl": "Uginanie ramion hantlami",
+              "name_en": "Dumbbell Biceps Curl",
+              "sets_reps": "2–3×10–12",
+              "start_weight_kg_per_hand": "10–12",
+              "rir": "1–2",
+              "video_url": "https://www.youtube.com/watch?v=3OZ2MT_5r3Q"
+            },
+            {
+              "name_pl": "Deska z sięgnięciem",
+              "name_en": "Plank with Reach",
+              "sets_reps": "2×30–45 s",
+              "video_url": "https://www.youtube.com/watch?v=aJMHkfTsnPw"
+            }
+          ],
+          "cardio": "LISS 8–12 min"
+        },
+        {
+          "day": "Środa",
+          "location": "dom",
+          "focus": "klatka + plecy (tempo/pauzy)",
+          "exercises": [
+            {
+              "name_pl": "Wyciskanie hantli płasko",
+              "name_en": "Dumbbell Bench Press",
+              "sets_reps": "4×10–12",
+              "start_weight_kg_per_hand": 15,
+              "tempo": "3–1–1",
+              "rir": "1–2 (ostatnia)",
+              "video_url": "https://www.youtube.com/watch?v=i1fywF_g-1U"
+            },
+            {
+              "name_pl": "Wiosłowanie jednorącz",
+              "name_en": "One-Arm Dumbbell Row",
+              "sets_reps": "4×10–12/str.",
+              "start_weight_kg": 15,
+              "rir": "1–2",
+              "video_url": "https://www.youtube.com/watch?v=pYcpY20QaE8"
+            },
+            {
+              "name_pl": "Goblet box squat do ławki",
+              "name_en": "Goblet Box Squat",
+              "sets_reps": "3×8–10",
+              "start_weight_kg": 15,
+              "notes": "możesz dociążyć plecak 5–15 kg",
+              "tempo": "3–0–1",
+              "video_url": "https://www.youtube.com/watch?v=hzXZufWm7Mk"
+            },
+            {
+              "name_pl": "Hip Thrust/Glute Bridge z DB",
+              "name_en": "Dumbbell Hip Thrust/Glute Bridge",
+              "sets_reps": "3×10–12",
+              "start_weight_kg_total": 30,
+              "notes": "pauza 2 s w górze",
+              "video_url": "https://www.youtube.com/watch?v=LM8XHLYJoYs"
+            },
+            {
+              "name_pl": "Rozpiętki DB/guma",
+              "name_en": "Dumbbell/Band Flye",
+              "sets_reps": "2–3×12–15",
+              "start_weight_kg_per_hand": "6–10",
+              "video_url": "https://www.youtube.com/watch?v=eozdVDA78K0"
+            },
+            {
+              "name_pl": "„Lat pulldown” z gumą",
+              "name_en": "Resistance Band Lat Pulldown",
+              "sets_reps": "3×12–15",
+              "video_url": "https://www.youtube.com/watch?v=8zv8Pray4-w"
+            },
+            {
+              "name_pl": "Dead Bug",
+              "name_en": "Dead Bug",
+              "sets_reps": "2×8–10/str.",
+              "video_url": "https://www.youtube.com/watch?v=bxn9FBrt4-A"
+            }
+          ],
+          "cardio": "LISS 8–12 min"
+        }
+      ]
+    },
+    "B_3x_gym": {
+      "schedule": [
+        {
+          "copy_of_variantA_day": "Poniedziałek"
+        },
+        {
+          "copy_of_variantA_day": "Wtorek"
+        },
+        {
+          "day": "Piątek",
+          "location": "siłownia",
+          "focus": "klatka + grubość pleców + poślad",
+          "exercises": [
+            {
+              "name_pl": "Wyciskanie hantli płasko",
+              "name_en": "Dumbbell Bench Press",
+              "sets_reps": "4×8–10",
+              "start_weight_kg_per_hand": 26,
+              "rir": "2–3",
+              "video_url": "https://www.youtube.com/watch?v=i1fywF_g-1U"
+            },
+            {
+              "name_pl": "Wiosłowanie siedząc (V-grip)",
+              "name_en": "Seated Cable Row (V-grip)",
+              "sets_reps": "4×10–12",
+              "start_weight_kg": "55–60",
+              "rir": "2–3",
+              "video_url": "https://www.youtube.com/watch?v=7o2oolbmzeI"
+            },
+            {
+              "name_pl": "Martwy ciąg na trap bar",
+              "name_en": "Trap Bar Deadlift",
+              "sets_reps": "3×6",
+              "start_weight_kg": "80–85",
+              "rir": "2–3",
+              "video_url": "https://www.youtube.com/watch?v=eIFW8zspJzQ"
+            },
+            {
+              "name_pl": "Przysiad do boxa (front/goblet)",
+              "name_en": "Front/Goblet Box Squat",
+              "sets_reps": "3×6–8",
+              "start_weight_kg": "40–50",
+              "video_url": "https://www.youtube.com/watch?v=mIzIMLuwlEM"
+            },
+            {
+              "name_pl": "Face Pull",
+              "name_en": "Face Pull",
+              "sets_reps": "2–3×12–15",
+              "video_url": "https://www.youtube.com/watch?v=ljgqer1ZpXg"
+            },
+            {
+              "name_pl": "Pallof Press",
+              "name_en": "Pallof Press",
+              "sets_reps": "2×10–12/str.",
+              "video_url": "https://www.youtube.com/watch?v=gHGLwQGvtxg"
+            }
+          ],
+          "cardio": "LISS 8–12 min"
+        }
+      ]
+    }
+  },
+  "progression_rules": {
+    "T1": "kalibracja ciężarów do RIR 2–3",
+    "T2": "gdy RIR ≤1–2: +2,5–5 kg (DB: +2 kg/str.) lub +1–2 powt.",
+    "T3": "+2,5–5% tam, gdzie znów RIR ≤1–2; opcjonalnie +1 seria w głównym boju",
+    "T4_deload": "utrzymaj ciężary, −25–30% serii w ruchach z dużą zgiętością kolana; skup się na tempie/technice"
+  }
+}
