@@ -242,7 +242,7 @@ class TrainingPlanImporter {
         session.cardio = scheduleDay.cardio
         
         if let exercises = scheduleDay.exercises {
-            for jsonExercise in exercises {
+            for (index, jsonExercise) in exercises.enumerated() {
                 let exercise = Exercise(
                     namePl: jsonExercise.namePl,
                     nameEn: jsonExercise.nameEn,
@@ -254,6 +254,7 @@ class TrainingPlanImporter {
                 exercise.tempo = jsonExercise.tempo
                 exercise.notes = jsonExercise.notes
                 exercise.videoUrl = jsonExercise.videoUrl
+                exercise.sortOrder = index
                 session.exercises.append(exercise)
             }
         }

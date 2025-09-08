@@ -36,7 +36,7 @@ struct TrainingSessionView: View {
                     .padding(.horizontal)
                     
                     VStack(spacing: 12) {
-                        ForEach(Array(session.exercises.enumerated()), id: \.element) { index, exercise in
+                        ForEach(Array(session.exercises.sorted(by: { $0.sortOrder < $1.sortOrder }).enumerated()), id: \.element) { index, exercise in
                             ExerciseCard(
                                 exercise: exercise,
                                 number: index + 1,

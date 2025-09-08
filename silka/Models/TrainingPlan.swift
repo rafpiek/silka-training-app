@@ -144,6 +144,7 @@ final class Exercise {
     var videoUrl: String?
     var isCompleted: Bool
     var completedAt: Date?
+    var sortOrder: Int = 0
     private var setsDataString: String = ""
     
     var setsData: [Int: SetData] {
