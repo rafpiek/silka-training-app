@@ -15,61 +15,66 @@ struct TrainingSessionView: View {
     @State private var showingWarmup = false
     @State private var sessionTimer = SessionTimer()
     @State private var showingTimer = false
-    
+
     var body: some View {
-        VStack(spacing: 0) {
-            if showingTimer {
-                TimerView(sessionTimer: sessionTimer)
-                    .padding()
-                    .background(Color(.systemGray6))
-            }
-            
-            ScrollView {
-                VStack(alignment: .leading, spacing: 16) {
-                    SessionHeaderView(session: session)
-                    
-                    Button(action: { showingWarmup.toggle() }) {
-                        Label("Warmup Exercises", systemImage: "flame")
-                            .frame(maxWidth: .infinity)
-                    }
-                    .buttonStyle(.bordered)
-                    .padding(.horizontal)
-                    
-                    VStack(spacing: 12) {
-                        ForEach(Array(session.exercises.sorted(by: { $0.sortOrder < $1.sortOrder }).enumerated()), id: \.element) { index, exercise in
-                            ExerciseCard(
-                                exercise: exercise,
-                                number: index + 1,
-                                onTap: {
-                                    selectedExercise = exercise
-                                }
-                            )
+        ZStack {
+            SilkaDesign.Colors.background
+                .ignoresSafeArea()
+
+            VStack(spacing: 0) {
+                // Timer overlay when active
+                if showingTimer {
+                    ModernTimerOverlay(sessionTimer: sessionTimer)
+                        .padding(SilkaDesign.Spacing.md)
+                        .background(SilkaDesign.Colors.surface)
+                        .shadow(color: .black.opacity(0.1), radius: 4, x: 0, y: 2)
+                }
+
+                ScrollView {
+                    LazyVStack(spacing: SilkaDesign.Spacing.md) {
+                        ModernSessionHeader(session: session)
+                            .padding(.top, SilkaDesign.Spacing.sm)
+
+                        ModernWarmupButton(action: { showingWarmup.toggle() })
+
+                        LazyVStack(spacing: SilkaDesign.Spacing.sm) {
+                            ForEach(Array(session.exercises.sorted(by: { $0.sortOrder < $1.sortOrder }).enumerated()), id: \.element) { index, exercise in
+                                ModernExerciseCard(
+                                    exercise: exercise,
+                                    number: index + 1,
+                                    onTap: {
+                                        selectedExercise = exercise
+                                    }
+                                )
+                            }
                         }
+
+                        if let cardio = session.cardio {
+                            ModernCardioCard(cardio: cardio)
+                        }
+
+                        ModernCompleteSessionButton(session: session, modelContext: modelContext)
                     }
-                    .padding(.horizontal)
-                    
-                    if let cardio = session.cardio {
-                        CardioCard(cardio: cardio)
-                            .padding(.horizontal)
-                    }
-                    
-                    CompleteSessionButton(session: session, modelContext: modelContext)
-                        .padding()
+                    .padding(.horizontal, SilkaDesign.Spacing.md)
+                    .padding(.bottom, SilkaDesign.Spacing.xl)
                 }
             }
         }
         .navigationTitle(session.day)
-        .navigationBarTitleDisplayMode(.large)
+        .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
                 Button(action: {
                     if !sessionTimer.isRunning {
                         sessionTimer.start()
                     }
-                    showingTimer.toggle()
+                    withAnimation(.easeInOut(duration: 0.3)) {
+                        showingTimer.toggle()
+                    }
                 }) {
                     Image(systemName: showingTimer ? "timer.circle.fill" : "timer")
-                        .foregroundColor(sessionTimer.isRunning ? .blue : .primary)
+                        .font(.system(size: 18, weight: .medium))
+                        .foregroundColor(sessionTimer.isRunning ? SilkaDesign.Colors.accent : SilkaDesign.Colors.textSecondary)
                 }
             }
         }
@@ -82,177 +87,394 @@ struct TrainingSessionView: View {
     }
 }
 
-struct SessionHeaderView: View {
+// MARK: - Modern Session Components
+
+struct ModernSessionHeader: View {
     let session: TrainingSession
-    
+
     var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Text(session.focus)
-                .font(.title2)
-                .fontWeight(.semibold)
-            
-            HStack {
-                Label(session.location, systemImage: session.location == "siłownia" ? "dumbbell" : "house")
-                Spacer()
-                if session.isCompleted {
-                    Label("Completed", systemImage: "checkmark.circle.fill")
-                        .foregroundColor(.green)
+        VStack(spacing: SilkaDesign.Spacing.md) {
+            HStack(alignment: .top) {
+                VStack(alignment: .leading, spacing: SilkaDesign.Spacing.xs) {
+                    Text(session.focus)
+                        .font(SilkaDesign.Typography.displaySmall)
+                        .foregroundColor(SilkaDesign.Colors.textPrimary)
+                        .lineLimit(2)
+
+                    HStack(spacing: SilkaDesign.Spacing.sm) {
+                        HStack(spacing: SilkaDesign.Spacing.xs) {
+                            Image(systemName: session.location == "siłownia" ? "dumbbell" : "house")
+                                .font(.system(size: 14, weight: .medium))
+                                .foregroundColor(SilkaDesign.Colors.textSecondary)
+                            Text(session.location.capitalized)
+                                .font(SilkaDesign.Typography.bodyMedium)
+                                .foregroundColor(SilkaDesign.Colors.textSecondary)
+                        }
+
+                        if session.isCompleted {
+                            SilkaStatusBadge(text: "Completed", status: .completed)
+                        }
+                    }
                 }
+
+                Spacer()
             }
-            .font(.subheadline)
-            .foregroundColor(.secondary)
         }
-        .padding()
-        .background(Color(.systemGray6))
-        .cornerRadius(12)
-        .padding(.horizontal)
+        .padding(SilkaDesign.Spacing.lg)
+        .background(SilkaDesign.Colors.surface)
+        .cornerRadius(SilkaDesign.CornerRadius.lg)
+        .silkaShadow()
     }
 }
 
-struct ExerciseCard: View {
+struct ModernTimerOverlay: View {
+    @ObservedObject var sessionTimer: SessionTimer
+
+    var body: some View {
+        HStack(spacing: SilkaDesign.Spacing.md) {
+            HStack(spacing: SilkaDesign.Spacing.sm) {
+                Image(systemName: "stopwatch")
+                    .font(.system(size: 16, weight: .medium))
+                    .foregroundColor(SilkaDesign.Colors.accent)
+
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("Session Time")
+                        .font(SilkaDesign.Typography.labelSmall)
+                        .foregroundColor(SilkaDesign.Colors.textSecondary)
+                    Text(timeString(from: sessionTimer.elapsedTime))
+                        .font(SilkaDesign.Typography.monoMedium)
+                        .foregroundColor(SilkaDesign.Colors.textPrimary)
+                }
+            }
+
+            Spacer()
+
+            Button(action: {
+                if sessionTimer.isRunning {
+                    sessionTimer.stop()
+                } else {
+                    sessionTimer.start()
+                }
+            }) {
+                Image(systemName: sessionTimer.isRunning ? "pause.circle.fill" : "play.circle.fill")
+                    .font(.system(size: 20, weight: .medium))
+                    .foregroundColor(sessionTimer.isRunning ? SilkaDesign.Colors.warning : SilkaDesign.Colors.accent)
+            }
+        }
+    }
+
+    private func timeString(from timeInterval: TimeInterval) -> String {
+        let minutes = Int(timeInterval) / 60
+        let seconds = Int(timeInterval) % 60
+        return String(format: "%02d:%02d", minutes, seconds)
+    }
+}
+
+struct ModernWarmupButton: View {
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            HStack(spacing: SilkaDesign.Spacing.sm) {
+                Image(systemName: "flame.fill")
+                    .font(.system(size: 16, weight: .medium))
+                    .foregroundColor(SilkaDesign.Colors.warning)
+
+                Text("Start Warmup")
+                    .font(SilkaDesign.Typography.bodyMedium)
+                    .fontWeight(.medium)
+
+                Spacer()
+
+                Image(systemName: "chevron.right")
+                    .font(.system(size: 12, weight: .medium))
+                    .foregroundColor(SilkaDesign.Colors.textTertiary)
+            }
+            .padding(SilkaDesign.Spacing.md)
+            .background(SilkaDesign.Colors.warning.opacity(0.1))
+            .cornerRadius(SilkaDesign.CornerRadius.md)
+            .overlay(
+                RoundedRectangle(cornerRadius: SilkaDesign.CornerRadius.md)
+                    .stroke(SilkaDesign.Colors.warning.opacity(0.3), lineWidth: 1)
+            )
+        }
+        .buttonStyle(.plain)
+    }
+}
+
+struct ModernExerciseCard: View {
     @Bindable var exercise: Exercise
     let number: Int
     let onTap: () -> Void
-    
+    @State private var isPressed = false
+
     private func getLastUsedWeight(_ exercise: Exercise) -> Double? {
-        // Get the most recent weight from completed sets
         let completedSets = exercise.setsData.filter { $0.value.isCompleted }
         return completedSets.values.compactMap { $0.weight }.last
     }
-    
+
     var body: some View {
-        HStack {
-            VStack(alignment: .leading, spacing: 4) {
-                HStack {
-                    Text("\(number).")
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-                    Text(exercise.nameEn)
-                        .font(.headline)
-                    if exercise.isCompleted {
-                        Image(systemName: "checkmark.circle.fill")
-                            .foregroundColor(.green)
-                            .font(.caption)
+        VStack(spacing: 0) {
+            // Header
+            HStack(alignment: .top, spacing: SilkaDesign.Spacing.md) {
+                // Exercise number badge
+                Text("\(number)")
+                    .font(SilkaDesign.Typography.labelMedium)
+                    .fontWeight(.semibold)
+                    .foregroundColor(.white)
+                    .frame(width: 24, height: 24)
+                    .background(exercise.isCompleted ? SilkaDesign.Colors.success : SilkaDesign.Colors.accent)
+                    .clipShape(Circle())
+
+                VStack(alignment: .leading, spacing: SilkaDesign.Spacing.xs) {
+                    HStack {
+                        Text(exercise.nameEn)
+                            .font(SilkaDesign.Typography.headlineSmall)
+                            .foregroundColor(SilkaDesign.Colors.textPrimary)
+                            .lineLimit(2)
+
+                        if exercise.isCompleted {
+                            SilkaStatusBadge(text: "Done", status: .completed)
+                        }
                     }
+
+                    Text(exercise.namePl)
+                        .font(SilkaDesign.Typography.bodyMedium)
+                        .foregroundColor(SilkaDesign.Colors.textSecondary)
+                        .lineLimit(1)
                 }
-                
-                Text(exercise.namePl)
-                    .font(.caption)
-                    .foregroundColor(.secondary)
-                
-                HStack(spacing: 12) {
-                    Text(exercise.setsReps)
-                        .font(.subheadline)
-                        .fontWeight(.medium)
-                    
-                    // Show set completion progress
-                    Text("\(exercise.completedSets.count)/\(exercise.totalSets)")
-                        .font(.caption)
-                        .padding(.horizontal, 6)
-                        .padding(.vertical, 2)
-                        .background(exercise.isCompleted ? Color.green.opacity(0.2) : Color.orange.opacity(0.1))
-                        .cornerRadius(4)
-                    
-                    // Show weight used or suggested weight
+
+                Spacer()
+
+                Image(systemName: "chevron.right")
+                    .font(.system(size: 12, weight: .medium))
+                    .foregroundColor(SilkaDesign.Colors.textTertiary)
+            }
+            .padding(SilkaDesign.Spacing.md)
+
+            // Exercise details
+            VStack(spacing: SilkaDesign.Spacing.sm) {
+                HStack {
+                    // Sets & Reps
+                    HStack(spacing: SilkaDesign.Spacing.xs) {
+                        Image(systemName: "repeat")
+                            .font(.system(size: 12, weight: .medium))
+                            .foregroundColor(SilkaDesign.Colors.textSecondary)
+                        Text(exercise.setsReps)
+                            .font(SilkaDesign.Typography.labelMedium)
+                            .foregroundColor(SilkaDesign.Colors.textSecondary)
+                    }
+
+                    Spacer()
+
+                    // Progress indicator
+                    Text("\(exercise.completedSets.count)/\(exercise.totalSets) sets")
+                        .font(SilkaDesign.Typography.labelMedium)
+                        .foregroundColor(SilkaDesign.Colors.textSecondary)
+                }
+
+                // Progress bar
+                SilkaProgressBar(
+                    progress: Double(exercise.completedSets.count),
+                    total: Double(exercise.totalSets),
+                    color: exercise.isCompleted ? SilkaDesign.Colors.success : SilkaDesign.Colors.accent,
+                    height: 4
+                )
+
+                // Weight and additional info
+                HStack {
                     if let lastWeight = getLastUsedWeight(exercise) {
-                        Text("\(String(format: "%.0f", lastWeight)) kg")
-                            .font(.caption)
-                            .padding(.horizontal, 6)
-                            .padding(.vertical, 2)
-                            .background(Color.blue.opacity(0.1))
-                            .cornerRadius(4)
+                        HStack(spacing: SilkaDesign.Spacing.xs) {
+                            Image(systemName: "scalemass")
+                                .font(.system(size: 10, weight: .medium))
+                                .foregroundColor(SilkaDesign.Colors.accent)
+                            Text("\(String(format: "%.0f", lastWeight)) kg")
+                                .font(SilkaDesign.Typography.labelSmall)
+                                .foregroundColor(SilkaDesign.Colors.accent)
+                        }
+                        .padding(.horizontal, SilkaDesign.Spacing.xs)
+                        .padding(.vertical, 2)
+                        .background(SilkaDesign.Colors.accent.opacity(0.1))
+                        .cornerRadius(SilkaDesign.CornerRadius.xs)
                     } else if let weight = exercise.startWeightKg {
-                        Text("\(String(format: "%.0f", weight)) kg")
-                            .font(.caption)
-                            .padding(.horizontal, 6)
-                            .padding(.vertical, 2)
-                            .background(Color.gray.opacity(0.1))
-                            .cornerRadius(4)
+                        HStack(spacing: SilkaDesign.Spacing.xs) {
+                            Image(systemName: "scalemass")
+                                .font(.system(size: 10, weight: .medium))
+                                .foregroundColor(SilkaDesign.Colors.textTertiary)
+                            Text("\(String(format: "%.0f", weight)) kg")
+                                .font(SilkaDesign.Typography.labelSmall)
+                                .foregroundColor(SilkaDesign.Colors.textTertiary)
+                        }
+                        .padding(.horizontal, SilkaDesign.Spacing.xs)
+                        .padding(.vertical, 2)
+                        .background(SilkaDesign.Colors.borderSubtle)
+                        .cornerRadius(SilkaDesign.CornerRadius.xs)
                     } else if let weightPerHand = exercise.startWeightKgPerHand {
-                        Text("\(String(format: "%.0f", weightPerHand)) kg/h")
-                            .font(.caption)
-                            .padding(.horizontal, 6)
-                            .padding(.vertical, 2)
-                            .background(Color.gray.opacity(0.1))
-                            .cornerRadius(4)
+                        HStack(spacing: SilkaDesign.Spacing.xs) {
+                            Image(systemName: "scalemass")
+                                .font(.system(size: 10, weight: .medium))
+                                .foregroundColor(SilkaDesign.Colors.textTertiary)
+                            Text("\(String(format: "%.0f", weightPerHand)) kg/h")
+                                .font(SilkaDesign.Typography.labelSmall)
+                                .foregroundColor(SilkaDesign.Colors.textTertiary)
+                        }
+                        .padding(.horizontal, SilkaDesign.Spacing.xs)
+                        .padding(.vertical, 2)
+                        .background(SilkaDesign.Colors.borderSubtle)
+                        .cornerRadius(SilkaDesign.CornerRadius.xs)
                     }
-                    
+
                     if let rir = exercise.rir {
-                        Text("RIR: \(rir)")
-                            .font(.caption)
-                            .foregroundColor(.secondary)
+                        HStack(spacing: SilkaDesign.Spacing.xs) {
+                            Text("RIR")
+                                .font(SilkaDesign.Typography.labelSmall)
+                                .foregroundColor(SilkaDesign.Colors.textTertiary)
+                            Text(rir)
+                                .font(SilkaDesign.Typography.labelSmall)
+                                .fontWeight(.medium)
+                                .foregroundColor(SilkaDesign.Colors.textSecondary)
+                        }
+                        .padding(.horizontal, SilkaDesign.Spacing.xs)
+                        .padding(.vertical, 2)
+                        .background(SilkaDesign.Colors.borderSubtle)
+                        .cornerRadius(SilkaDesign.CornerRadius.xs)
                     }
+
+                    Spacer()
                 }
             }
-            
-            Spacer()
-            
-            Image(systemName: "chevron.right")
-                .foregroundColor(.secondary)
+            .padding(.horizontal, SilkaDesign.Spacing.md)
+            .padding(.bottom, SilkaDesign.Spacing.md)
         }
-        .padding()
-        .background(exercise.isCompleted ? Color.green.opacity(0.1) : Color(.systemGray6))
-        .cornerRadius(12)
+        .background(SilkaDesign.Colors.surface)
+        .cornerRadius(SilkaDesign.CornerRadius.md)
+        .scaleEffect(isPressed ? 0.98 : 1.0)
+        .animation(.easeInOut(duration: 0.1), value: isPressed)
+        .silkaShadow()
         .onTapGesture(perform: onTap)
+        .onLongPressGesture(minimumDuration: 0, maximumDistance: .infinity, pressing: { pressing in
+            isPressed = pressing
+        }, perform: {})
     }
 }
 
-struct CardioCard: View {
+struct ModernCardioCard: View {
     let cardio: String
-    
+
     var body: some View {
-        HStack {
-            Label("Cardio", systemImage: "figure.run")
+        HStack(spacing: SilkaDesign.Spacing.md) {
+            HStack(spacing: SilkaDesign.Spacing.sm) {
+                Image(systemName: "figure.run")
+                    .font(.system(size: 18, weight: .medium))
+                    .foregroundColor(SilkaDesign.Colors.warning)
+
+                VStack(alignment: .leading, spacing: SilkaDesign.Spacing.xs) {
+                    Text("Cardio")
+                        .font(SilkaDesign.Typography.headlineSmall)
+                        .foregroundColor(SilkaDesign.Colors.textPrimary)
+
+                    Text(cardio)
+                        .font(SilkaDesign.Typography.bodyMedium)
+                        .foregroundColor(SilkaDesign.Colors.textSecondary)
+                }
+            }
+
             Spacer()
-            Text(cardio)
-                .foregroundColor(.secondary)
+
+            SilkaStatusBadge(text: "Optional", status: .info)
         }
-        .padding()
-        .background(Color.orange.opacity(0.1))
-        .cornerRadius(12)
+        .padding(SilkaDesign.Spacing.md)
+        .background(SilkaDesign.Colors.warning.opacity(0.05))
+        .cornerRadius(SilkaDesign.CornerRadius.md)
+        .overlay(
+            RoundedRectangle(cornerRadius: SilkaDesign.CornerRadius.md)
+                .stroke(SilkaDesign.Colors.warning.opacity(0.2), lineWidth: 1)
+        )
     }
 }
 
-struct CompleteSessionButton: View {
+struct ModernCompleteSessionButton: View {
     @Bindable var session: TrainingSession
     let modelContext: ModelContext
-    
+
     var allExercisesCompleted: Bool {
         session.exercises.allSatisfy { $0.isCompleted }
     }
-    
+
     var body: some View {
-        VStack(spacing: 12) {
+        VStack(spacing: SilkaDesign.Spacing.sm) {
+            // Complete Session Button
             Button(action: {
                 session.isCompleted = true
                 session.completedDate = Date()
                 try? modelContext.save()
             }) {
-                Label(
-                    session.isCompleted ? "Session Completed" : "Complete Session",
-                    systemImage: session.isCompleted ? "checkmark.circle.fill" : "checkmark.circle"
-                )
+                HStack(spacing: SilkaDesign.Spacing.sm) {
+                    Image(systemName: session.isCompleted ? "checkmark.circle.fill" : "checkmark.circle")
+                        .font(.system(size: 16, weight: .medium))
+
+                    Text(session.isCompleted ? "Session Completed" : "Complete Session")
+                        .font(SilkaDesign.Typography.bodyMedium)
+                        .fontWeight(.medium)
+                }
                 .frame(maxWidth: .infinity)
+                .padding(SilkaDesign.Spacing.md)
+                .background(
+                    session.isCompleted ? SilkaDesign.Colors.success :
+                    (allExercisesCompleted ? SilkaDesign.Colors.accent : SilkaDesign.Colors.textTertiary)
+                )
+                .foregroundColor(.white)
+                .cornerRadius(SilkaDesign.CornerRadius.md)
             }
-            .buttonStyle(.borderedProminent)
             .disabled(session.isCompleted || !allExercisesCompleted)
-            
+            .opacity((session.isCompleted || !allExercisesCompleted) ? 0.6 : 1.0)
+
+            // Reset Session Button
             Button(action: {
-                // Reset all exercises
                 for exercise in session.exercises {
                     exercise.resetSets()
                 }
-                // Reset session
                 session.isCompleted = false
                 session.completedDate = nil
                 try? modelContext.save()
             }) {
-                Label("Reset Session", systemImage: "arrow.counterclockwise")
-                    .frame(maxWidth: .infinity)
+                HStack(spacing: SilkaDesign.Spacing.sm) {
+                    Image(systemName: "arrow.counterclockwise")
+                        .font(.system(size: 16, weight: .medium))
+
+                    Text("Reset Session")
+                        .font(SilkaDesign.Typography.bodyMedium)
+                        .fontWeight(.medium)
+                }
+                .frame(maxWidth: .infinity)
+                .padding(SilkaDesign.Spacing.md)
+                .background(SilkaDesign.Colors.surface)
+                .foregroundColor(SilkaDesign.Colors.warning)
+                .cornerRadius(SilkaDesign.CornerRadius.md)
+                .overlay(
+                    RoundedRectangle(cornerRadius: SilkaDesign.CornerRadius.md)
+                        .stroke(SilkaDesign.Colors.warning.opacity(0.3), lineWidth: 1)
+                )
             }
-            .buttonStyle(.bordered)
-            .foregroundColor(.orange)
+
+            // Progress indicator
+            if !allExercisesCompleted && !session.isCompleted {
+                HStack {
+                    Text("Complete all exercises to finish session")
+                        .font(SilkaDesign.Typography.labelMedium)
+                        .foregroundColor(SilkaDesign.Colors.textSecondary)
+                    Spacer()
+                    Text("\(session.exercises.filter { $0.isCompleted }.count)/\(session.exercises.count)")
+                        .font(SilkaDesign.Typography.labelMedium)
+                        .foregroundColor(SilkaDesign.Colors.textSecondary)
+                }
+                .padding(.top, SilkaDesign.Spacing.xs)
+            }
         }
+        .padding(SilkaDesign.Spacing.lg)
+        .background(SilkaDesign.Colors.surface)
+        .cornerRadius(SilkaDesign.CornerRadius.lg)
+        .silkaShadow()
     }
 }
 
@@ -261,7 +483,7 @@ class SessionTimer: ObservableObject {
     @Published var isRunning = false
     private var timer: Timer?
     private var startTime: Date?
-    
+
     func start() {
         if !isRunning {
             startTime = Date()
@@ -273,13 +495,13 @@ class SessionTimer: ObservableObject {
             }
         }
     }
-    
+
     func stop() {
         timer?.invalidate()
         timer = nil
         isRunning = false
     }
-    
+
     func reset() {
         stop()
         elapsedTime = 0

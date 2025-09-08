@@ -13,13 +13,13 @@ struct ContentView: View {
     @Query private var trainingPlans: [TrainingPlan]
     @State private var selectedSession: TrainingSession?
     @State private var showSplash = true
-    
+
     private var currentTrainingPlan: TrainingPlan? {
         trainingPlans.first
     }
-    
+
     private let weekDays = ["Poniedziałek", "Wtorek", "Środa", "Czwartek", "Piątek", "Sobota", "Niedziela"]
-    
+
     var body: some View {
         if showSplash {
             SplashView {
@@ -28,45 +28,35 @@ struct ContentView: View {
                 }
             }
         } else {
-            TabView {
+            // RADICAL LINEAR-INSPIRED DESIGN: Full-width minimal layout
                 NavigationStack {
+                ZStack {
+                    SilkaDesign.Colors.background
+                        .ignoresSafeArea()
+
                     ScrollView {
-                        VStack(spacing: 16) {
+                        LazyVStack(spacing: SilkaDesign.Spacing.xl) {
                             if let plan = currentTrainingPlan {
-                                WeeklyProgressSummary(trainingPlan: plan)
-                                
-                                ForEach(weekDays, id: \.self) { day in
-                                    if let session = plan.trainingSessions.first(where: { $0.day == day }) {
-                                        TrainingDayCard(session: session)
-                                            .onTapGesture {
-                                                selectedSession = session
-                                            }
-                                    } else {
-                                        RestDayCard(day: day)
-                                    }
-                                }
-                            } else {
-                                ContentUnavailableView(
-                                    "No Training Plan",
-                                    systemImage: "dumbbell",
-                                    description: Text("Training plan data not loaded")
+                                // Ultra-minimal header
+                                LinearHeader(plan: plan)
+
+                                // Linear-style session list
+                                LinearSessionList(
+                                    plan: plan,
+                                    weekDays: weekDays,
+                                    selectedSession: $selectedSession
                                 )
+                            } else {
+                                LinearEmptyState()
                             }
                         }
-                        .padding()
-                    }
-                    .navigationTitle("Training Week")
-                    .navigationDestination(item: $selectedSession) { session in
-                        TrainingSessionView(session: session)
+                        .padding(.horizontal, SilkaDesign.Spacing.lg)
+                        .padding(.vertical, SilkaDesign.Spacing.lg)
                     }
                 }
-                .tabItem {
-                    Label("Training", systemImage: "calendar")
-                }
-                
-                StatsView()
-                    .tabItem {
-                        Label("Statistics", systemImage: "chart.line.uptrend.xyaxis")
+                .navigationBarHidden(true)
+                .navigationDestination(item: $selectedSession) { session in
+                    TrainingSessionView(session: session)
                     }
             }
             .transition(.opacity.combined(with: .scale))
@@ -74,179 +64,156 @@ struct ContentView: View {
     }
 }
 
-struct TrainingDayCard: View {
+// MARK: - Modern Components
+
+struct ModernTrainingDayCard: View {
     let session: TrainingSession
-    
+    @State private var isPressed = false
+
     private var completedExercises: Int {
         session.exercises.filter { $0.isCompleted }.count
     }
-    
+
     private var completionPercentage: Double {
         guard session.exercises.count > 0 else { return 0 }
         return Double(completedExercises) / Double(session.exercises.count)
     }
-    
-    private var formattedCompletionDate: String {
-        guard let date = session.completedDate else { return "" }
-        let formatter = DateFormatter()
-        formatter.dateStyle = .medium
-        formatter.timeStyle = .short
-        return formatter.string(from: date)
+
+    private var statusBadge: SilkaStatusBadge {
+        if session.isCompleted {
+            return SilkaStatusBadge(text: "Done", status: .completed)
+        } else if completedExercises > 0 {
+            return SilkaStatusBadge(text: "In Progress", status: .inProgress)
+        } else {
+            return SilkaStatusBadge(text: "Pending", status: .pending)
+        }
     }
-    
+
     var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            // Header with day and completion status
-            HStack {
-                VStack(alignment: .leading, spacing: 4) {
+        VStack(spacing: 0) {
+            HStack(alignment: .top, spacing: SilkaDesign.Spacing.md) {
+                VStack(alignment: .leading, spacing: SilkaDesign.Spacing.xs) {
                     Text(session.day)
-                        .font(.headline)
-                        .foregroundColor(session.isCompleted ? .green : .primary)
+                        .font(SilkaDesign.Typography.headlineMedium)
+                        .foregroundColor(SilkaDesign.Colors.textPrimary)
+
                     Text(session.focus)
-                        .font(.caption)
-                        .foregroundColor(.secondary)
+                        .font(SilkaDesign.Typography.bodyMedium)
+                        .foregroundColor(SilkaDesign.Colors.textSecondary)
+                        .lineLimit(2)
                 }
+
                 Spacer()
-                
-                VStack(alignment: .trailing, spacing: 4) {
-                    if session.isCompleted {
-                        HStack(spacing: 4) {
-                            Image(systemName: "checkmark.circle.fill")
-                                .foregroundColor(.green)
-                                .font(.title2)
-                            Text("DONE")
-                                .font(.caption)
-                                .fontWeight(.bold)
-                                .foregroundColor(.green)
-                        }
-                    } else if completedExercises > 0 {
-                        HStack(spacing: 4) {
-                            Image(systemName: "clock.fill")
-                                .foregroundColor(.orange)
-                                .font(.caption)
-                            Text("IN PROGRESS")
-                                .font(.caption2)
-                                .fontWeight(.bold)
-                                .foregroundColor(.orange)
-                        }
-                    }
-                    
+
+                VStack(alignment: .trailing, spacing: SilkaDesign.Spacing.xs) {
+                    statusBadge
+
                     Image(systemName: "chevron.right")
-                        .foregroundColor(.secondary)
-                        .font(.caption)
+                        .font(.system(size: 12, weight: .medium))
+                        .foregroundColor(SilkaDesign.Colors.textTertiary)
                 }
             }
-            
-            // Progress bar and exercise info
-            VStack(spacing: 8) {
+            .padding(SilkaDesign.Spacing.md)
+
+            // Progress section
+            VStack(spacing: SilkaDesign.Spacing.sm) {
                 HStack {
-                    Label(session.location, systemImage: session.location == "siłownia" ? "dumbbell" : "house")
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-                    Spacer()
-                    Text("\(completedExercises)/\(session.exercises.count) exercises")
-                        .font(.caption)
-                        .fontWeight(.medium)
-                        .foregroundColor(session.isCompleted ? .green : .secondary)
-                }
-                
-                // Progress bar
-                GeometryReader { geometry in
-                    ZStack(alignment: .leading) {
-                        Rectangle()
-                            .fill(Color(.systemGray4))
-                            .frame(height: 4)
-                            .cornerRadius(2)
-                        
-                        Rectangle()
-                            .fill(session.isCompleted ? Color.green : Color.blue)
-                            .frame(width: geometry.size.width * completionPercentage, height: 4)
-                            .cornerRadius(2)
-                            .animation(.easeInOut(duration: 0.3), value: completionPercentage)
+                    HStack(spacing: SilkaDesign.Spacing.xs) {
+                        Image(systemName: session.location == "siłownia" ? "dumbbell" : "house")
+                            .font(.system(size: 12, weight: .medium))
+                            .foregroundColor(SilkaDesign.Colors.textSecondary)
+                        Text(session.location.capitalized)
+                            .font(SilkaDesign.Typography.labelMedium)
+                            .foregroundColor(SilkaDesign.Colors.textSecondary)
                     }
-                }
-                .frame(height: 4)
-            }
-            
-            // Completion date if completed
-            if session.isCompleted, !formattedCompletionDate.isEmpty {
-                HStack {
-                    Image(systemName: "calendar.badge.checkmark")
-                        .foregroundColor(.green)
-                        .font(.caption)
-                    Text("Completed: \(formattedCompletionDate)")
-                        .font(.caption2)
-                        .foregroundColor(.secondary)
+
                     Spacer()
+
+                    Text("\(completedExercises)/\(session.exercises.count) exercises")
+                        .font(SilkaDesign.Typography.labelMedium)
+                        .foregroundColor(SilkaDesign.Colors.textSecondary)
                 }
-                .padding(.top, 4)
-            }
-        }
-        .padding()
-        .background(
-            session.isCompleted 
-            ? Color.green.opacity(0.1)
-            : (completedExercises > 0 ? Color.blue.opacity(0.05) : Color(.systemGray6))
-        )
-        .overlay(
-            RoundedRectangle(cornerRadius: 12)
-                .stroke(
-                    session.isCompleted 
-                    ? Color.green.opacity(0.3)
-                    : (completedExercises > 0 ? Color.blue.opacity(0.2) : Color.clear),
-                    lineWidth: session.isCompleted ? 2 : 1
+
+                SilkaProgressBar(
+                    progress: Double(completedExercises),
+                    total: Double(session.exercises.count),
+                    color: session.isCompleted ? SilkaDesign.Colors.success : SilkaDesign.Colors.accent,
+                    height: 6
                 )
-        )
-        .cornerRadius(12)
-    }
-}
-
-struct RestDayCard: View {
-    let day: String
-    
-    var body: some View {
-        HStack {
-            VStack(alignment: .leading) {
-                Text(day)
-                    .font(.headline)
-                Text("Rest Day")
-                    .font(.caption)
-                    .foregroundColor(.secondary)
             }
-            Spacer()
-            Image(systemName: "bed.double")
-                .foregroundColor(.secondary)
+            .padding(.horizontal, SilkaDesign.Spacing.md)
+            .padding(.bottom, SilkaDesign.Spacing.md)
         }
-        .padding()
-        .background(Color(.systemGray6).opacity(0.5))
-        .cornerRadius(12)
+        .background(SilkaDesign.Colors.surface)
+        .cornerRadius(SilkaDesign.CornerRadius.md)
+        .scaleEffect(isPressed ? 0.98 : 1.0)
+        .animation(.easeInOut(duration: 0.1), value: isPressed)
+        .silkaShadow()
+        .onLongPressGesture(minimumDuration: 0, maximumDistance: .infinity, pressing: { pressing in
+            isPressed = pressing
+        }, perform: {})
     }
 }
 
-struct WeeklyProgressSummary: View {
+struct ModernRestDayCard: View {
+    let day: String
+
+    var body: some View {
+        HStack(spacing: SilkaDesign.Spacing.md) {
+            VStack(alignment: .leading, spacing: SilkaDesign.Spacing.xs) {
+                Text(day)
+                    .font(SilkaDesign.Typography.headlineMedium)
+                    .foregroundColor(SilkaDesign.Colors.textPrimary)
+
+                Text("Rest Day")
+                    .font(SilkaDesign.Typography.bodyMedium)
+                    .foregroundColor(SilkaDesign.Colors.textSecondary)
+            }
+
+            Spacer()
+
+            HStack(spacing: SilkaDesign.Spacing.sm) {
+                Image(systemName: "bed.double.fill")
+                    .font(.system(size: 16, weight: .medium))
+                    .foregroundColor(SilkaDesign.Colors.textTertiary)
+
+                SilkaStatusBadge(text: "Rest", status: .info)
+            }
+        }
+        .padding(SilkaDesign.Spacing.md)
+        .background(SilkaDesign.Colors.surface.opacity(0.6))
+        .cornerRadius(SilkaDesign.CornerRadius.md)
+        .overlay(
+            RoundedRectangle(cornerRadius: SilkaDesign.CornerRadius.md)
+                .stroke(SilkaDesign.Colors.borderSubtle, lineWidth: 1)
+        )
+    }
+}
+
+struct ModernWeeklyProgressSummary: View {
     let trainingPlan: TrainingPlan
-    
+
     private var completedSessions: Int {
         trainingPlan.trainingSessions.filter { $0.isCompleted }.count
     }
-    
+
     private var totalSessions: Int {
         trainingPlan.trainingSessions.count
     }
-    
+
     private var completionPercentage: Double {
         guard totalSessions > 0 else { return 0 }
         return Double(completedSessions) / Double(totalSessions)
     }
-    
+
     private var currentStreak: Int {
+        let weekDays = ["Poniedziałek", "Wtorek", "Środa", "Czwartek", "Piątek", "Sobota", "Niedziela"]
         let sortedSessions = trainingPlan.trainingSessions.sorted { session1, session2 in
-            let weekDays = ["Poniedziałek", "Wtorek", "Środa", "Czwartek", "Piątek", "Sobota", "Niedziela"]
             let index1 = weekDays.firstIndex(of: session1.day) ?? 0
             let index2 = weekDays.firstIndex(of: session2.day) ?? 0
             return index1 < index2
         }
-        
+
         var streak = 0
         for session in sortedSessions {
             if session.isCompleted {
@@ -257,134 +224,139 @@ struct WeeklyProgressSummary: View {
         }
         return streak
     }
-    
+
     private var totalExercisesCompleted: Int {
         trainingPlan.trainingSessions.flatMap { $0.exercises }.filter { $0.isCompleted }.count
     }
-    
+
     private var totalExercises: Int {
         trainingPlan.trainingSessions.flatMap { $0.exercises }.count
     }
-    
+
     var body: some View {
-        VStack(spacing: 12) {
-            HStack {
-                VStack(alignment: .leading, spacing: 4) {
-                    Text("Weekly Progress")
-                        .font(.title2)
-                        .fontWeight(.semibold)
-                    
-                    Text("Track your training consistency")
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-                }
-                Spacer()
-                
-                if currentStreak > 0 {
-                    HStack(spacing: 4) {
-                        Image(systemName: "flame.fill")
-                            .foregroundColor(.orange)
-                        Text("\(currentStreak)")
-                            .font(.headline)
-                            .fontWeight(.bold)
-                        Text("streak")
-                            .font(.caption)
-                            .foregroundColor(.secondary)
-                    }
-                }
-            }
-            
-            // Progress statistics
-            HStack(spacing: 20) {
-                // Sessions progress
-                VStack(alignment: .center, spacing: 4) {
-                    Text("\(completedSessions)/\(totalSessions)")
-                        .font(.title3)
-                        .fontWeight(.bold)
-                        .foregroundColor(completionPercentage == 1.0 ? .green : .primary)
-                    Text("Sessions")
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-                }
-                
-                Divider()
-                    .frame(height: 30)
-                
-                // Exercises progress
-                VStack(alignment: .center, spacing: 4) {
-                    Text("\(totalExercisesCompleted)/\(totalExercises)")
-                        .font(.title3)
-                        .fontWeight(.bold)
-                        .foregroundColor(.blue)
-                    Text("Exercises")
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-                }
-                
-                Divider()
-                    .frame(height: 30)
-                
-                // Overall percentage
-                VStack(alignment: .center, spacing: 4) {
-                    Text("\(Int(completionPercentage * 100))%")
-                        .font(.title3)
-                        .fontWeight(.bold)
-                        .foregroundColor(completionPercentage >= 0.8 ? .green : (completionPercentage >= 0.5 ? .orange : .red))
-                    Text("Complete")
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-                }
-            }
-            
-            // Overall progress bar
-            VStack(spacing: 6) {
-                HStack {
+        VStack(spacing: SilkaDesign.Spacing.lg) {
+            // Header
+            HStack(alignment: .top) {
+                VStack(alignment: .leading, spacing: SilkaDesign.Spacing.xs) {
                     Text("Week Overview")
-                        .font(.caption)
-                        .fontWeight(.medium)
-                    Spacer()
-                    Text("🔥 \(currentStreak) day streak")
-                        .font(.caption2)
-                        .foregroundColor(.orange)
-                        .opacity(currentStreak > 0 ? 1 : 0)
+                        .font(SilkaDesign.Typography.displaySmall)
+                        .foregroundColor(SilkaDesign.Colors.textPrimary)
+
+                    Text("Your training progress this week")
+                        .font(SilkaDesign.Typography.bodyMedium)
+                        .foregroundColor(SilkaDesign.Colors.textSecondary)
                 }
-                
-                GeometryReader { geometry in
-                    ZStack(alignment: .leading) {
-                        Rectangle()
-                            .fill(Color(.systemGray5))
-                            .frame(height: 6)
-                            .cornerRadius(3)
-                        
-                        Rectangle()
-                            .fill(
-                                LinearGradient(
-                                    colors: completionPercentage >= 0.8 ? [.green, .green.opacity(0.7)] : [.blue, .blue.opacity(0.7)],
-                                    startPoint: .leading,
-                                    endPoint: .trailing
-                                )
-                            )
-                            .frame(width: geometry.size.width * completionPercentage, height: 6)
-                            .cornerRadius(3)
-                            .animation(.spring(response: 0.6, dampingFraction: 0.8), value: completionPercentage)
+
+                Spacer()
+
+                if currentStreak > 0 {
+                    VStack(alignment: .trailing, spacing: SilkaDesign.Spacing.xs) {
+                        HStack(spacing: SilkaDesign.Spacing.xs) {
+                        Image(systemName: "flame.fill")
+                                .font(.system(size: 14, weight: .medium))
+                                .foregroundColor(SilkaDesign.Colors.warning)
+                        Text("\(currentStreak)")
+                                .font(SilkaDesign.Typography.monoMedium)
+                                .foregroundColor(SilkaDesign.Colors.textPrimary)
+                        }
+                        Text("day streak")
+                            .font(SilkaDesign.Typography.labelSmall)
+                            .foregroundColor(SilkaDesign.Colors.textSecondary)
                     }
                 }
-                .frame(height: 6)
+            }
+
+            // Metrics Grid
+            HStack(spacing: 0) {
+                SilkaMetric(
+                    title: "Sessions",
+                    value: "\(completedSessions)/\(totalSessions)",
+                    color: completionPercentage == 1.0 ? SilkaDesign.Colors.success : SilkaDesign.Colors.textPrimary,
+                    alignment: .center
+                )
+
+                Rectangle()
+                    .fill(SilkaDesign.Colors.borderSubtle)
+                    .frame(width: 1, height: 40)
+
+                SilkaMetric(
+                    title: "Exercises",
+                    value: "\(totalExercisesCompleted)/\(totalExercises)",
+                    color: SilkaDesign.Colors.accent,
+                    alignment: .center
+                )
+
+                Rectangle()
+                    .fill(SilkaDesign.Colors.borderSubtle)
+                    .frame(width: 1, height: 40)
+
+                SilkaMetric(
+                    title: "Complete",
+                    value: "\(Int(completionPercentage * 100))%",
+                    color: completionPercentage >= 0.8 ? SilkaDesign.Colors.success :
+                           (completionPercentage >= 0.5 ? SilkaDesign.Colors.warning : SilkaDesign.Colors.error),
+                    alignment: .center
+                )
+            }
+
+            // Progress Bar
+            VStack(spacing: SilkaDesign.Spacing.sm) {
+                HStack {
+                    Text("Weekly Progress")
+                        .font(SilkaDesign.Typography.labelMedium)
+                        .foregroundColor(SilkaDesign.Colors.textSecondary)
+
+                    Spacer()
+
+                    Text("\(Int(completionPercentage * 100))% complete")
+                        .font(SilkaDesign.Typography.labelMedium)
+                        .foregroundColor(SilkaDesign.Colors.textSecondary)
+                }
+
+                SilkaProgressBar(
+                    progress: Double(completedSessions),
+                    total: Double(totalSessions),
+                    color: completionPercentage >= 0.8 ? SilkaDesign.Colors.success : SilkaDesign.Colors.accent,
+                    height: 8
+                )
             }
         }
-        .padding()
+        .padding(SilkaDesign.Spacing.lg)
         .background(
             LinearGradient(
                 colors: [
-                    Color(.systemGray6),
-                    Color(.systemGray6).opacity(0.5)
+                    SilkaDesign.Colors.surface,
+                    SilkaDesign.Colors.surface.opacity(0.8)
                 ],
                 startPoint: .topLeading,
                 endPoint: .bottomTrailing
             )
         )
-        .cornerRadius(16)
-        .shadow(color: .black.opacity(0.1), radius: 2, x: 0, y: 1)
+        .cornerRadius(SilkaDesign.CornerRadius.lg)
+        .silkaShadow(SilkaDesign.Shadows.medium)
+    }
+}
+
+struct ModernEmptyState: View {
+    var body: some View {
+        VStack(spacing: SilkaDesign.Spacing.lg) {
+            Image(systemName: "dumbbell")
+                .font(.system(size: 48, weight: .light))
+                .foregroundColor(SilkaDesign.Colors.textTertiary)
+
+            VStack(spacing: SilkaDesign.Spacing.sm) {
+                Text("No Training Plan")
+                    .font(SilkaDesign.Typography.displaySmall)
+                    .foregroundColor(SilkaDesign.Colors.textPrimary)
+
+                Text("Your training plan is loading or not available")
+                    .font(SilkaDesign.Typography.bodyMedium)
+                    .foregroundColor(SilkaDesign.Colors.textSecondary)
+                    .multilineTextAlignment(.center)
+            }
+        }
+        .padding(SilkaDesign.Spacing.xl)
+        .frame(maxWidth: .infinity)
     }
 }
 
