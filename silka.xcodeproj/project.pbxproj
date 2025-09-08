@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		B5D88CCD2E6EF7040026435F /* Training Plan for Muscle Gain.json in Resources */ = {isa = PBXBuildFile; fileRef = B5D88CCC2E6EF7040026435F /* Training Plan for Muscle Gain.json */; };
+		B5D88CCD2E6EF7040026435F /* silka/data/Training Plan for Muscle Gain.json in Resources */ = {isa = PBXBuildFile; fileRef = B5D88CCC2E6EF7040026435F /* silka/data/Training Plan for Muscle Gain.json */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -32,7 +32,8 @@
 		B5D88CA92E6EF3400026435F /* silkaTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = silkaTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		B5D88CB32E6EF3400026435F /* silkaUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = silkaUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		B5D88CCA2E6EF7030026435F /* silka.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = silka.xcodeproj; sourceTree = "<group>"; };
-		B5D88CCC2E6EF7040026435F /* Training Plan for Muscle Gain.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = "silka/data/Training Plan for Muscle Gain.json"; sourceTree = "<group>"; };
+		B5D88CCC2E6EF7040026435F /* silka/data/Training Plan for Muscle Gain.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = "silka/data/Training Plan for Muscle Gain.json"; sourceTree = "<group>"; };
+		B5DD5CFF2E6EFC65003EAEAA /* silka.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = silka.xcodeproj; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -98,15 +99,8 @@
 				B5D88CAC2E6EF3400026435F /* silkaTests */,
 				B5D88CB62E6EF3400026435F /* silkaUITests */,
 				B5D88C992E6EF3400026435F /* Products */,
+				B5DD5CEE2E6EFC65003EAEAA /* Recovered References */,
 			);
-			sourceTree = "<group>";
-		};
-		B5D88CCE2E6EF7050026435F /* data */ = {
-			isa = PBXGroup;
-			children = (
-				B5D88CCC2E6EF7040026435F /* Training Plan for Muscle Gain.json */,
-			);
-			path = data;
 			sourceTree = "<group>";
 		};
 		B5D88C992E6EF3400026435F /* Products */ = {
@@ -120,6 +114,19 @@
 			sourceTree = "<group>";
 		};
 		B5D88CCB2E6EF7030026435F /* Products */ = {
+			isa = PBXGroup;
+			name = Products;
+			sourceTree = "<group>";
+		};
+		B5DD5CEE2E6EFC65003EAEAA /* Recovered References */ = {
+			isa = PBXGroup;
+			children = (
+				B5D88CCC2E6EF7040026435F /* silka/data/Training Plan for Muscle Gain.json */,
+			);
+			name = "Recovered References";
+			sourceTree = "<group>";
+		};
+		B5DD5D012E6EFC65003EAEAA /* Products */ = {
 			isa = PBXGroup;
 			name = Products;
 			sourceTree = "<group>";
@@ -235,6 +242,10 @@
 					ProductGroup = B5D88CCB2E6EF7030026435F /* Products */;
 					ProjectRef = B5D88CCA2E6EF7030026435F /* silka.xcodeproj */;
 				},
+				{
+					ProductGroup = B5DD5D012E6EFC65003EAEAA /* Products */;
+					ProjectRef = B5DD5CFF2E6EFC65003EAEAA /* silka.xcodeproj */;
+				},
 			);
 			projectRoot = "";
 			targets = (
@@ -250,7 +261,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				B5D88CCD2E6EF7040026435F /* Training Plan for Muscle Gain.json in Resources */,
+				B5D88CCD2E6EF7040026435F /* silka/data/Training Plan for Muscle Gain.json in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

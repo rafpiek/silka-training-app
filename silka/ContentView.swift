@@ -12,6 +12,7 @@ struct ContentView: View {
     @Environment(\.modelContext) private var modelContext
     @Query private var trainingPlans: [TrainingPlan]
     @State private var selectedSession: TrainingSession?
+    @State private var showSplash = true
     
     private var currentTrainingPlan: TrainingPlan? {
         trainingPlans.first
@@ -20,34 +21,43 @@ struct ContentView: View {
     private let weekDays = ["Poniedziałek", "Wtorek", "Środa", "Czwartek", "Piątek", "Sobota", "Niedziela"]
     
     var body: some View {
-        NavigationStack {
-            ScrollView {
-                VStack(spacing: 16) {
-                    if let plan = currentTrainingPlan {
-                        ForEach(weekDays, id: \.self) { day in
-                            if let session = plan.trainingSessions.first(where: { $0.day == day }) {
-                                TrainingDayCard(session: session)
-                                    .onTapGesture {
-                                        selectedSession = session
-                                    }
-                            } else {
-                                RestDayCard(day: day)
-                            }
-                        }
-                    } else {
-                        ContentUnavailableView(
-                            "No Training Plan",
-                            systemImage: "dumbbell",
-                            description: Text("Training plan data not loaded")
-                        )
-                    }
+        if showSplash {
+            SplashView {
+                withAnimation(.easeInOut(duration: 0.6)) {
+                    showSplash = false
                 }
-                .padding()
             }
-            .navigationTitle("Training Week")
-            .navigationDestination(item: $selectedSession) { session in
-                TrainingSessionView(session: session)
+        } else {
+            NavigationStack {
+                ScrollView {
+                    VStack(spacing: 16) {
+                        if let plan = currentTrainingPlan {
+                            ForEach(weekDays, id: \.self) { day in
+                                if let session = plan.trainingSessions.first(where: { $0.day == day }) {
+                                    TrainingDayCard(session: session)
+                                        .onTapGesture {
+                                            selectedSession = session
+                                        }
+                                } else {
+                                    RestDayCard(day: day)
+                                }
+                            }
+                        } else {
+                            ContentUnavailableView(
+                                "No Training Plan",
+                                systemImage: "dumbbell",
+                                description: Text("Training plan data not loaded")
+                            )
+                        }
+                    }
+                    .padding()
+                }
+                .navigationTitle("Training Week")
+                .navigationDestination(item: $selectedSession) { session in
+                    TrainingSessionView(session: session)
+                }
             }
+            .transition(.opacity.combined(with: .scale))
         }
     }
 }
