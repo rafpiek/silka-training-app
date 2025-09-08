@@ -14,8 +14,14 @@ struct ExerciseDetailView: View {
     @ObservedObject var sessionTimer: SessionTimer
     @Environment(\.dismiss) private var dismiss
     @Environment(\.modelContext) private var modelContext
+    @Query private var trainingPlans: [TrainingPlan]
     @State private var breakTimer = BreakTimer()
     @State private var showingDeleteAlert = false
+    @State private var showingExerciseStats = false
+    
+    private var currentTrainingPlan: TrainingPlan? {
+        trainingPlans.first
+    }
     
     var body: some View {
         NavigationStack {
@@ -49,9 +55,37 @@ struct ExerciseDetailView: View {
             .navigationTitle("Exercise")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Button("View Stats") {
+                        showingExerciseStats = true
+                    }
+                    .foregroundColor(.blue)
+                }
+                
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button("Done") {
                         dismiss()
+                    }
+                }
+            }
+            .sheet(isPresented: $showingExerciseStats) {
+                if let plan = currentTrainingPlan,
+                   let stats = ExerciseStatsService.getStatsForExercise(exercise.nameEn, from: plan) {
+                    ExerciseStatsView(exerciseStats: stats)
+                } else {
+                    NavigationStack {
+                        ContentUnavailableView(
+                            "No Statistics Available",
+                            systemImage: "chart.line.uptrend.xyaxis",
+                            description: Text("Complete this exercise in more sessions to see statistics")
+                        )
+                        .toolbar {
+                            ToolbarItem(placement: .navigationBarTrailing) {
+                                Button("Done") {
+                                    showingExerciseStats = false
+                                }
+                            }
+                        }
                     }
                 }
             }
